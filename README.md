@@ -80,3 +80,19 @@ lake update
 lake exe cache get
 lake build
 # Output: Build completed successfully.
+
+
+
+
+
+
+## 📜 The Four Philosophical Axioms
+
+SCA is built on four foundational philosophical axioms that reject the traditional "agentic" view of AI:
+
+1. **The Instrument Metaphor:** A pen does not need to be aligned with the writer. Safety is guaranteed by the tool's complete lack of ontological independence.
+2. **Structural Incapacity:** The machine does not "choose" to obey; it is structurally incapable of generating an unguided action.
+3. **Destruction over Rejection:** A machine that "rejects" a command implies agency. SCA replaces rejection with terminal destruction (the `MELTED` state).
+4. **Sovereign Enforcement:** The hardware is a pure enforcement mechanism. Semantic decoding is the sole responsibility of the accredited sovereign institution.
+
+*(Read the full philosophical breakdown in [`PHILOSOPHY.md`](PHILOSOPHY.md))*

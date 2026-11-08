@@ -1,0 +1,83 @@
+$c = @'
+import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.Algebra.Order.Monoid.Defs
+
+open CategoryTheory
+
+namespace DIP.AxiomIV
+
+universe v u
+
+variable {C : Type u} [Category.{v} C]
+variable {E : Type} [OrderedAddCommMonoid E]
+
+inductive Path : C -> C -> Type (max u v) where
+  | nil {X : C} : Path X X
+  | cons {X Y Z : C} (f : CategoryStruct.Hom X Y) (p : Path Y Z) : Path X Z
+
+namespace Path
+
+def gradeOf (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E) :
+    forall {X Y : C}, Path X Y -> E
+  | _, _, .nil => 0
+  | _, _, .cons f p => grade f + gradeOf grade p
+
+@[simp] theorem gradeOf_nil (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    {X : C} :
+    gradeOf grade (Path.nil (X := X)) = 0 := rfl
+
+@[simp] theorem gradeOf_cons (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    {X Y Z : C} (f : CategoryStruct.Hom X Y) (p : Path Y Z) :
+    gradeOf grade (.cons f p) = grade f + gradeOf grade p := rfl
+
+def append : forall {X Y Z : C}, Path X Y -> Path Y Z -> Path X Z
+  | _, _, _, .nil, q => q
+  | _, _, _, .cons f p, q => .cons f (append p q)
+
+@[simp] theorem append_nil {X Y : C} (q : Path X Y) :
+    append Path.nil q = q := rfl
+
+@[simp] theorem append_cons {X Y Z W : C}
+    (f : CategoryStruct.Hom X Y) (p : Path Y Z) (q : Path Z W) :
+    append (.cons f p) q = .cons f (append p q) := rfl
+
+theorem gradeOf_append (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    {X Y Z : C} (p : Path X Y) (q : Path Y Z) :
+    gradeOf grade (append p q) = gradeOf grade p + gradeOf grade q := by
+  induction p with
+  | nil => simp
+  | cons f p' ih =>
+    simp only [append_cons, gradeOf_cons, ih]
+    ac_rfl
+
+theorem gradeOf_nonneg (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    (grade_nonneg : forall {X Y : C} (f : CategoryStruct.Hom X Y),
+      LE.le (0 : E) (grade f))
+    {X Y : C} (p : Path X Y) : LE.le (0 : E) (gradeOf grade p) := by
+  induction p with
+  | nil => exact le_refl 0
+  | cons f p' ih => exact add_nonneg (grade_nonneg f) ih
+
+def withinBudget (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    (colim_sigma : E) {X Y : C} (p : Path X Y) : Prop :=
+  LE.le (gradeOf grade p) colim_sigma
+
+theorem stasis (grade : {X Y : C} -> CategoryStruct.Hom X Y -> E)
+    (grade_nonneg : forall {X Y : C} (f : CategoryStruct.Hom X Y),
+      LE.le (0 : E) (grade f))
+    (colim_sigma : E) {X Y : C} (p : Path X Y)
+    (h : Not (withinBudget grade colim_sigma p))
+    {Z : C} (q : Path Y Z) :
+    Not (withinBudget grade colim_sigma (append p q)) := by
+  intro h_ext
+  apply h
+  unfold withinBudget at *
+  rw [gradeOf_append grade p q] at h_ext
+  have hq : LE.le (0 : E) (gradeOf grade q) := gradeOf_nonneg grade grade_nonneg q
+  linarith
+
+end Path
+end DIP.AxiomIV
+'@
+[System.IO.File]::WriteAllText("$HOME\DIP_Project\DIPProject\AxiomIV.lean", $c, [System.Text.ASCIIEncoding]::new())
+Write-Host "AxiomIV.lean done"

@@ -96,3 +96,7 @@ SCA is built on four foundational philosophical axioms that reject the tradition
 4. **Sovereign Enforcement:** The hardware is a pure enforcement mechanism. Semantic decoding is the sole responsibility of the accredited sovereign institution.
 
 *(Read the full philosophical breakdown in [`PHILOSOPHY.md`](PHILOSOPHY.md))*
+
+
+
+Status: Archived for future funding. This is a formally verified Zero-Agency AI architecture (Lean 4 + VHDL). I am currently seeking industry partnerships or grants to prototype this on FPGA
